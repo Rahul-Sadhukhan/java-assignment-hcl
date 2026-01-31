@@ -1,28 +1,26 @@
 package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 
-import com.fulfilment.application.monolith.warehouses.adapters.database.DbWarehouse;
 import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
-import com.warehouse.api.WarehouseResource;
-import com.warehouse.api.beans.Warehouse;
+import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
+import com.fulfilment.application.monolith.warehouses.adapters.database.DbWarehouse;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
-import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
-import com.fulfilment.application.monolith.warehouses.domain.WarehouseResource;
 
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequestScoped
-public class WarehouseResourceImpl implements com.fulfilment.application.monolith.warehouses.domain.WarehouseResource {
+public class WarehouseResourceImpl implements com.warehouse.api.WarehouseResource {
 
   @Inject private WarehouseRepository warehouseRepository;
 
   @Override
   public List<com.warehouse.api.beans.Warehouse> listAllWarehousesUnits() {
-    return warehouseRepository.getAll().stream().map(this::toWarehouseResponse).toList();
+    return warehouseRepository.getAll().stream().map(this::toWarehouseResponse)
+            .toList();
   }
 
   @Override
@@ -68,7 +66,8 @@ public class WarehouseResourceImpl implements com.fulfilment.application.monolit
   }
 
   @Override
-  public com.warehouse.api.beans.Warehouse replaceTheCurrentActiveWarehouse(String businessUnitCode, @NotNull com.warehouse.api.beans.Warehouse data) {
+  public com.warehouse.api.beans.Warehouse replaceTheCurrentActiveWarehouse(String businessUnitCode,
+                                                                            @NotNull com.warehouse.api.beans.Warehouse data) {
 
         Warehouse existing = warehouseRepository.findByBusinessUnitCode(businessUnitCode);
 
@@ -83,7 +82,7 @@ public class WarehouseResourceImpl implements com.fulfilment.application.monolit
               Response.Status.BAD_REQUEST);
     }
 
-    if (!data.getStock().equals(existing.stock)) {
+    if (data.getStock() != existing.stock) {
       throw new WebApplicationException(
               "Stock must match existing warehouse stock",
               Response.Status.BAD_REQUEST);
@@ -100,14 +99,21 @@ public class WarehouseResourceImpl implements com.fulfilment.application.monolit
     return toWarehouseResponse(replacement);
   }
 
-  private Warehouse toWarehouseResponse(
-      com.fulfilment.application.monolith.warehouses.domain.models.Warehouse warehouse) {
-    var response = new Warehouse();
+  private com.warehouse.api.beans.Warehouse toWarehouseResponse(Warehouse warehouse) {
+    var response = new com.warehouse.api.beans.Warehouse();
     response.setBusinessUnitCode(warehouse.businessUnitCode);
     response.setLocation(warehouse.location);
     response.setCapacity(warehouse.capacity);
     response.setStock(warehouse.stock);
-
     return response;
+  }
+  private Warehouse
+  toDomainWarehouse(com.warehouse.api.beans.Warehouse data) {
+    var w = new com.fulfilment.application.monolith.warehouses.domain.models.Warehouse();
+    w.businessUnitCode = data.getBusinessUnitCode();
+    w.location = data.getLocation();
+    w.capacity = data.getCapacity();
+    w.stock = data.getStock();
+    return w;
   }
 }
