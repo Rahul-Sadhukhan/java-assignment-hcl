@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/fcs-interview-code-assignment-main-20260130T152522Z-3-001.iml" filepath="$PROJECT_DIR$/.idea/fcs-interview-code-assignment-main-20260130T152522Z-3-001.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fcs-interview-code-assignment-main/java-assignment/java-code-assignment.iml" filepath="$PROJECT_DIR$/fcs-interview-code-assignment-main/java-assignment/java-code-assignment.iml" />
     </modules>
   </component>
 </project>
